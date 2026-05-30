@@ -1,10 +1,10 @@
 {
-  "name": "alphago-animation",
+  "name": "training-video",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "start": "npx remotion studio",
-    "build": "npx remotion render AlphaGoTicTacToe out/video.mp4",
+    "build": "npx remotion render AlphaGoTicTacToe out/video.mp4 && npx remotion render WeightUpdate out/weight-update.mp4",
     "upgrade": "npx remotion upgrade"
   },
   "keywords": [],

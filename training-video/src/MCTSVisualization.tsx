@@ -24,10 +24,10 @@ const SCENES = {
   tree: { start: 32, end: 48 },
   selection: { start: 48, end: 66 },
   expansion: { start: 66, end: 85 },
-  backprop: { start: 85, end: 102 },
-  simulate: { start: 102, end: 120 },
-  result: { start: 120, end: 132 },
-  summary: { start: 132, end: 150 },
+  backprop: { start: 85, end: 130 },
+  simulate: { start: 130, end: 148 },
+  result: { start: 148, end: 160 },
+  summary: { start: 160, end: 178 },
 };
 
 // 棋盘组件
@@ -261,16 +261,16 @@ export const MCTSVisualization: React.FC = () => {
       <Sequence from={66 * fps} durationInFrames={19 * fps}>
         <Audio src={staticFile("audio/mcts/narration-expansion.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={85 * fps} durationInFrames={17 * fps}>
+      <Sequence from={85 * fps} durationInFrames={45 * fps}>
         <Audio src={staticFile("audio/mcts/narration-backprop.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={102 * fps} durationInFrames={18 * fps}>
+      <Sequence from={130 * fps} durationInFrames={18 * fps}>
         <Audio src={staticFile("audio/mcts/narration-simulate.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={120 * fps} durationInFrames={12 * fps}>
+      <Sequence from={148 * fps} durationInFrames={12 * fps}>
         <Audio src={staticFile("audio/mcts/narration-result.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={132 * fps} durationInFrames={18 * fps}>
+      <Sequence from={160 * fps} durationInFrames={18 * fps}>
         <Audio src={staticFile("audio/mcts/narration-summary.mp3")} volume={1.0} />
       </Sequence>
 
@@ -488,15 +488,89 @@ export const MCTSVisualization: React.FC = () => {
               <svg width="100%" height="500" viewBox={`0 0 ${width - 120} 500`}>
                 <DepthLabels />
                 <TreeNodeComponent node={tree} depth={0} />
-                {/* 回溯箭头 — 从孙节点(leaf)经子节点到根节点 */}
+                
+                {/* 回溯动画 — 逐层高亮 */}
+                {/* 第1步：叶子节点 */}
+                <circle
+                  cx={width / 2 - 240}
+                  cy={450}
+                  r={30}
+                  fill="none"
+                  stroke="#4CAF50"
+                  strokeWidth={4}
+                  opacity={interpolate(sceneFrame, [0, fps * 2], [0, 1, 1], { extrapolateRight: "clamp" })}
+                />
+                <text
+                  x={width / 2 - 240}
+                  y={490}
+                  textAnchor="middle"
+                  fill="#4CAF50"
+                  fontSize={18}
+                  fontWeight="bold"
+                  opacity={interpolate(sceneFrame, [0, fps * 2], [0, 1, 1], { extrapolateRight: "clamp" })}
+                >
+                  v = +0.3
+                </text>
+                
+                {/* 第2步：回溯到白棋层 */}
                 <path
-                  d={`M ${width / 2 - 240} 450 L ${width / 2 - 200} 300 L ${width / 2} 150`}
+                  d={`M ${width / 2 - 240} 450 L ${width / 2 - 200} 300`}
                   stroke="#FFD700"
                   strokeWidth={4}
                   fill="none"
                   strokeDasharray="10,5"
-                  opacity={interpolate(sceneFrame, [0, fps], [0, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [fps * 2, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
                 />
+                <circle
+                  cx={width / 2 - 200}
+                  cy={300}
+                  r={30}
+                  fill="none"
+                  stroke="#ff6b6b"
+                  strokeWidth={4}
+                  opacity={interpolate(sceneFrame, [fps * 2, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
+                />
+                <text
+                  x={width / 2 - 200}
+                  y={340}
+                  textAnchor="middle"
+                  fill="#ff6b6b"
+                  fontSize={18}
+                  fontWeight="bold"
+                  opacity={interpolate(sceneFrame, [fps * 2, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
+                >
+                  v = -0.3（翻转）
+                </text>
+                
+                {/* 第3步：回溯到黑棋层 */}
+                <path
+                  d={`M ${width / 2 - 200} 300 L ${width / 2} 150`}
+                  stroke="#FFD700"
+                  strokeWidth={4}
+                  fill="none"
+                  strokeDasharray="10,5"
+                  opacity={interpolate(sceneFrame, [fps * 4, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
+                />
+                <circle
+                  cx={width / 2}
+                  cy={150}
+                  r={30}
+                  fill="none"
+                  stroke="#4CAF50"
+                  strokeWidth={4}
+                  opacity={interpolate(sceneFrame, [fps * 4, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
+                />
+                <text
+                  x={width / 2}
+                  y={190}
+                  textAnchor="middle"
+                  fill="#4CAF50"
+                  fontSize={18}
+                  fontWeight="bold"
+                  opacity={interpolate(sceneFrame, [fps * 4, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
+                >
+                  v = +0.3（再翻转）
+                </text>
               </svg>
             </div>
             <div style={{ width: 400 }}>
@@ -522,6 +596,24 @@ export const MCTSVisualization: React.FC = () => {
                   注意：每上一层翻转符号（v = -v）
                   <div style={{ color: "#888", fontSize: 14, marginTop: 10 }}>
                     因为对手视角相反
+                  </div>
+                </div>
+                <div style={{ 
+                  marginTop: 30,
+                  padding: 20,
+                  backgroundColor: "#1a1a1a",
+                  borderRadius: 8,
+                  fontSize: 16,
+                }}>
+                  <div style={{ color: "#FFD700", marginBottom: 10, fontWeight: "bold" }}>
+                    为什么要翻转？
+                  </div>
+                  <div style={{ color: "#ccc", lineHeight: 1.6 }}>
+                    叶子节点 +0.3 表示<span style={{ color: "#4CAF50" }}>黑棋稍优</span>
+                    <br />
+                    对白棋来说，这是<span style={{ color: "#ff6b6b" }}>坏局面</span>，所以是 -0.3
+                    <br />
+                    对黑棋来说，又是<span style={{ color: "#4CAF50" }}>好局面</span>，所以是 +0.3
                   </div>
                 </div>
               </div>

@@ -125,6 +125,43 @@ const TreeNodeComponent: React.FC<{ node: TreeNode; depth: number }> = ({ node, 
   );
 };
 
+// 层级标注：每层谁在下棋
+const DEPTH_LABELS = [
+  { y: 150, label: "黑棋走", color: "#00ff88" },
+  { y: 300, label: "白棋走", color: "#ff6b6b" },
+  { y: 450, label: "黑棋走", color: "#00ff88" },
+];
+
+const DepthLabels: React.FC = () => (
+  <g>
+    {DEPTH_LABELS.map((d, i) => (
+      <g key={i}>
+        <rect x={10} y={d.y - 14} width={80} height={28} rx={6} fill="#1a1a1a" stroke={d.color} strokeWidth={1.5} />
+        <text x={50} y={d.y + 5} textAnchor="middle" fill={d.color} fontSize={14} fontWeight="bold" fontFamily="sans-serif">
+          {d.label}
+        </text>
+      </g>
+    ))}
+  </g>
+);
+
+// 层标签组件 — 标注每层是谁在下棋
+const DepthLabels: React.FC = () => {
+  return (
+    <g>
+      <text x={30} y={155} fill="#FFD700" fontSize={16} fontFamily="monospace" fontWeight="bold">
+        黑棋走
+      </text>
+      <text x={30} y={305} fill="#ff6b6b" fontSize={16} fontFamily="monospace" fontWeight="bold">
+        白棋走
+      </text>
+      <text x={30} y={455} fill="#FFD700" fontSize={16} fontFamily="monospace" fontWeight="bold">
+        黑棋走
+      </text>
+    </g>
+  );
+};
+
 // 主组件
 export const MCTSVisualization: React.FC = () => {
   const frame = useCurrentFrame();
@@ -335,6 +372,7 @@ export const MCTSVisualization: React.FC = () => {
           <div style={{ display: "flex", gap: 60 }}>
             <div style={{ flex: 1 }}>
               <svg width="100%" height="500" viewBox={`0 0 ${width - 120} 500`}>
+                <DepthLabels />
                 <TreeNodeComponent node={tree} depth={0} />
               </svg>
             </div>
@@ -367,6 +405,7 @@ export const MCTSVisualization: React.FC = () => {
           <div style={{ display: "flex", gap: 60 }}>
             <div style={{ flex: 1 }}>
               <svg width="100%" height="500" viewBox={`0 0 ${width - 120} 500`}>
+                <DepthLabels />
                 <TreeNodeComponent node={tree} depth={0} />
               </svg>
             </div>
@@ -405,10 +444,11 @@ export const MCTSVisualization: React.FC = () => {
           <div style={{ display: "flex", gap: 60 }}>
             <div style={{ flex: 1 }}>
               <svg width="100%" height="500" viewBox={`0 0 ${width - 120} 500`}>
+                <DepthLabels />
                 <TreeNodeComponent node={tree} depth={0} />
-                {/* 新节点动画 */}
+                {/* 新节点动画 — 对齐第一个孙节点位置 (width/2 - 240, 450) */}
                 <circle
-                  cx={width / 2 - 200}
+                  cx={width / 2 - 240}
                   cy={450}
                   r={25}
                   fill="#4CAF50"
@@ -446,10 +486,11 @@ export const MCTSVisualization: React.FC = () => {
           <div style={{ display: "flex", gap: 60 }}>
             <div style={{ flex: 1 }}>
               <svg width="100%" height="500" viewBox={`0 0 ${width - 120} 500`}>
+                <DepthLabels />
                 <TreeNodeComponent node={tree} depth={0} />
-                {/* 回溯箭头 */}
+                {/* 回溯箭头 — 从孙节点(leaf)经子节点到根节点 */}
                 <path
-                  d={`M ${width / 2 - 200} 450 L ${width / 2 - 200} 300 L ${width / 2} 150`}
+                  d={`M ${width / 2 - 240} 450 L ${width / 2 - 200} 300 L ${width / 2} 150`}
                   stroke="#FFD700"
                   strokeWidth={4}
                   fill="none"
@@ -498,6 +539,7 @@ export const MCTSVisualization: React.FC = () => {
           <div style={{ display: "flex", gap: 60 }}>
             <div style={{ flex: 1 }}>
               <svg width="100%" height="500" viewBox={`0 0 ${width - 120} 500`}>
+                <DepthLabels />
                 <TreeNodeComponent node={tree} depth={0} />
               </svg>
             </div>

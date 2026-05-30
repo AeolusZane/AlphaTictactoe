@@ -16,18 +16,18 @@ interface TreeNode {
   highlighted?: boolean;
 }
 
-// 场景时间轴（秒）
+// 场景时间轴（秒）— 根据音频实际时长分配，每段留 2-3s 缓冲
 const SCENES = {
-  title: { start: 0, end: 5 },
-  problem: { start: 5, end: 15 },
-  idea: { start: 15, end: 25 },
-  tree: { start: 25, end: 35 },
-  selection: { start: 35, end: 50 },
-  expansion: { start: 50, end: 65 },
-  backprop: { start: 65, end: 80 },
-  simulate: { start: 80, end: 100 },
-  result: { start: 100, end: 110 },
-  summary: { start: 110, end: 120 },
+  title: { start: 0, end: 8 },
+  problem: { start: 8, end: 18 },
+  idea: { start: 18, end: 32 },
+  tree: { start: 32, end: 48 },
+  selection: { start: 48, end: 66 },
+  expansion: { start: 66, end: 85 },
+  backprop: { start: 85, end: 102 },
+  simulate: { start: 102, end: 120 },
+  result: { start: 120, end: 132 },
+  summary: { start: 132, end: 150 },
 };
 
 // 棋盘组件
@@ -205,35 +205,35 @@ export const MCTSVisualization: React.FC = () => {
       {/* 背景音乐 */}
       <Audio src={staticFile("audio/bgm.mp3")} volume={0.2} />
 
-      {/* 配音 */}
-      <Sequence from={0} durationInFrames={5 * fps}>
+      {/* 配音 — 时间轴与 SCENES 对齐 */}
+      <Sequence from={0} durationInFrames={8 * fps}>
         <Audio src={staticFile("audio/mcts/narration-title.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={5 * fps} durationInFrames={10 * fps}>
+      <Sequence from={8 * fps} durationInFrames={10 * fps}>
         <Audio src={staticFile("audio/mcts/narration-problem.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={15 * fps} durationInFrames={10 * fps}>
+      <Sequence from={18 * fps} durationInFrames={14 * fps}>
         <Audio src={staticFile("audio/mcts/narration-idea.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={25 * fps} durationInFrames={10 * fps}>
+      <Sequence from={32 * fps} durationInFrames={16 * fps}>
         <Audio src={staticFile("audio/mcts/narration-tree.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={35 * fps} durationInFrames={15 * fps}>
+      <Sequence from={48 * fps} durationInFrames={18 * fps}>
         <Audio src={staticFile("audio/mcts/narration-selection.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={50 * fps} durationInFrames={15 * fps}>
+      <Sequence from={66 * fps} durationInFrames={19 * fps}>
         <Audio src={staticFile("audio/mcts/narration-expansion.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={65 * fps} durationInFrames={15 * fps}>
+      <Sequence from={85 * fps} durationInFrames={17 * fps}>
         <Audio src={staticFile("audio/mcts/narration-backprop.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={80 * fps} durationInFrames={20 * fps}>
+      <Sequence from={102 * fps} durationInFrames={18 * fps}>
         <Audio src={staticFile("audio/mcts/narration-simulate.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={100 * fps} durationInFrames={10 * fps}>
+      <Sequence from={120 * fps} durationInFrames={12 * fps}>
         <Audio src={staticFile("audio/mcts/narration-result.mp3")} volume={1.0} />
       </Sequence>
-      <Sequence from={110 * fps} durationInFrames={10 * fps}>
+      <Sequence from={132 * fps} durationInFrames={18 * fps}>
         <Audio src={staticFile("audio/mcts/narration-summary.mp3")} volume={1.0} />
       </Sequence>
 

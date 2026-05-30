@@ -4,14 +4,14 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, Seq
 const audioConfig = {
   bgm: staticFile("audio/bgm.mp3"),  // 背景音乐
   narrations: {
-    title: staticFile("audio/narration-title.mp3"),      // "AlphaGo 井字棋训练演示"
-    intro: staticFile("audio/narration-intro.mp3"),      // "接下来你将看到..."
-    step1: staticFile("audio/narration-step1.mp3"),      // "第一步，黑棋选择中心位置..."
-    step2: staticFile("audio/narration-step2.mp3"),      // "第二步，白棋选择左上角..."
-    step3: staticFile("audio/narration-step3.mp3"),      // "第三步，黑棋形成对角线威胁..."
-    step4: staticFile("audio/narration-step4.mp3"),      // "第四步，白棋必须防守..."
-    step5: staticFile("audio/narration-step5.mp3"),      // "第五步，黑棋获胜！"
-    stats: staticFile("audio/narration-stats.mp3"),      // "训练统计..."
+    title: staticFile("audio/alphago-tictactoe/narration-title.mp3"),      // "AlphaGo 井字棋训练演示"
+    intro: staticFile("audio/alphago-tictactoe/narration-intro.mp3"),      // "接下来你将看到..."
+    step1: staticFile("audio/alphago-tictactoe/narration-step1.mp3"),      // "第一步，黑棋选择中心位置..."
+    step2: staticFile("audio/alphago-tictactoe/narration-step2.mp3"),      // "第二步，白棋选择左上角..."
+    step3: staticFile("audio/alphago-tictactoe/narration-step3.mp3"),      // "第三步，黑棋形成对角线威胁..."
+    step4: staticFile("audio/alphago-tictactoe/narration-step4.mp3"),      // "第四步，白棋必须防守..."
+    step5: staticFile("audio/alphago-tictactoe/narration-step5.mp3"),      // "第五步，黑棋获胜！"
+    stats: staticFile("audio/alphago-tictactoe/narration-stats.mp3"),      // "训练统计..."
   },
 };
 

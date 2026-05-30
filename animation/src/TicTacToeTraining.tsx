@@ -1,4 +1,19 @@
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, Sequence } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, Sequence, Audio } from "remotion";
+
+// 音频配置
+const audioConfig = {
+  bgm: "/audio/bgm.mp3",  // 背景音乐
+  narrations: {
+    title: "/audio/narration-title.mp3",      // "AlphaGo 井字棋训练演示"
+    intro: "/audio/narration-intro.mp3",      // "接下来你将看到..."
+    step1: "/audio/narration-step1.mp3",      // "第一步，黑棋选择中心位置..."
+    step2: "/audio/narration-step2.mp3",      // "第二步，白棋选择左上角..."
+    step3: "/audio/narration-step3.mp3",      // "第三步，黑棋形成对角线威胁..."
+    step4: "/audio/narration-step4.mp3",      // "第四步，白棋必须防守..."
+    step5: "/audio/narration-step5.mp3",      // "第五步，黑棋获胜！"
+    stats: "/audio/narration-stats.mp3",      // "训练统计..."
+  },
+};
 
 // 模拟训练数据
 const trainingGames = [
@@ -102,6 +117,43 @@ export const TicTacToeTraining: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0a0a", fontFamily: "monospace" }}>
+      {/* 背景音乐 - 全程播放，音量较低 */}
+      <Audio src={audioConfig.bgm} volume={0.3} />
+
+      {/* 配音解说 - 按时间轴播放 */}
+      <Sequence from={0} durationInFrames={4 * fps}>
+        <Audio src={audioConfig.narrations.title} volume={1.0} />
+      </Sequence>
+
+      <Sequence from={4 * fps} durationInFrames={4 * fps}>
+        <Audio src={audioConfig.narrations.intro} volume={1.0} />
+      </Sequence>
+
+      {/* 每步的配音 - 每步 8 秒 */}
+      <Sequence from={8 * fps} durationInFrames={8 * fps}>
+        <Audio src={audioConfig.narrations.step1} volume={1.0} />
+      </Sequence>
+
+      <Sequence from={16 * fps} durationInFrames={8 * fps}>
+        <Audio src={audioConfig.narrations.step2} volume={1.0} />
+      </Sequence>
+
+      <Sequence from={24 * fps} durationInFrames={8 * fps}>
+        <Audio src={audioConfig.narrations.step3} volume={1.0} />
+      </Sequence>
+
+      <Sequence from={32 * fps} durationInFrames={8 * fps}>
+        <Audio src={audioConfig.narrations.step4} volume={1.0} />
+      </Sequence>
+
+      <Sequence from={40 * fps} durationInFrames={8 * fps}>
+        <Audio src={audioConfig.narrations.step5} volume={1.0} />
+      </Sequence>
+
+      <Sequence from={48 * fps} durationInFrames={12 * fps}>
+        <Audio src={audioConfig.narrations.stats} volume={1.0} />
+      </Sequence>
+
       {/* 标题 */}
       <Sequence from={0} durationInFrames={4 * fps}>
         <Title />

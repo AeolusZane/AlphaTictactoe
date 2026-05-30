@@ -42,12 +42,12 @@ python alphago_tictactoe.py --verbose
 python alphago_tictactoe.py --play
 ```
 
-## 动画演示
+## 训练动画视频
 
-`animation/` 目录包含用 Remotion 制作的训练过程可视化动画：
+`training-video/` 目录包含用 [Remotion](https://www.remotion.dev/) 制作的训练过程可视化动画视频：
 
 ```bash
-cd animation
+cd training-video
 npm install
 npm start        # 预览（浏览器打开 http://localhost:3000）
 npm run build    # 渲染为 MP4 视频
@@ -67,6 +67,6 @@ npm run build    # 渲染为 MP4 视频
 AlphaTictactoe/
 ├── alphago_tictactoe.py    # 主程序
 ├── docs/                   # 详细教程（4篇）
-├── animation/              # Remotion 动画项目
+├── training-video/         # Remotion 训练动画视频
 └── README.md
 ```

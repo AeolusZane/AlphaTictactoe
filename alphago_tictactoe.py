@@ -12,6 +12,7 @@ AlphaGo 简化版 —— 井字棋
 
 import math
 import random
+import time
 import numpy as np
 import torch
 import torch.nn as nn
@@ -236,19 +237,42 @@ def mcts_search(board, net, num_simulations=100):
 # 第四部分：自我对弈 + 训练
 # ============================================================
 
-def self_play(net, num_simulations=50):
+def self_play(net, num_simulations=50, verbose=False, log_file=None, game_idx=None):
     """
     让 AI 跟自己对弈一局，收集训练数据
+
+    参数：
+      verbose: 是否打印对弈过程
+      log_file: 日志文件对象（可选）
+      game_idx: 当前局号（用于日志标记）
 
     返回：[(state, mcts_policy, winner), ...]
       - state: 棋盘状态
       - mcts_policy: MCTS 搜索后的走法概率分布（比神经网络原始输出更准）
       - winner: 最终赢家
     """
+    def log(msg):
+        """写日志：同时输出到控制台和文件"""
+        if verbose:
+            print(msg)
+        if log_file:
+            log_file.write(msg + "\n")
+            log_file.flush()
+
     board = Board()
     game_data = []
+    move_history = []  # 记录走法历史
 
+    if verbose or log_file:
+        log(f"\n{'='*50}")
+        log(f"第 {game_idx} 局开始")
+        log(f"{'='*50}")
+
+    step = 0
     while True:
+        step += 1
+        player_name = "X(黑)" if board.current_player == 1 else "O(白)"
+
         # 用 MCTS 搜索当前最佳走法
         visit_counts = mcts_search(board, net, num_simulations)
 
@@ -265,12 +289,69 @@ def self_play(net, num_simulations=50):
 
         # 选访问次数最多的走法（贪心）
         best_move = max(visit_counts, key=visit_counts.get)
+
+        # --- 日志：记录当前局面和决策 ---
+        if verbose or log_file:
+            log(f"\n--- 第 {step} 步 | {player_name} 行棋 ---")
+            log(f"当前棋盘:")
+            # 格式化棋盘，显示位置编号
+            grid_display = []
+            for i in range(9):
+                if board.grid[i] == 1:
+                    grid_display.append("X")
+                elif board.grid[i] == -1:
+                    grid_display.append("O")
+                else:
+                    grid_display.append(str(i))
+            log(f"  {grid_display[0]} | {grid_display[1]} | {grid_display[2]}")
+            log(f"  ---------")
+            log(f"  {grid_display[3]} | {grid_display[4]} | {grid_display[5]}")
+            log(f"  ---------")
+            log(f"  {grid_display[6]} | {grid_display[7]} | {grid_display[8]}")
+
+            # 显示 MCTS 搜索分布
+            log(f"MCTS 搜索分布 (共 {total_visits} 次模拟):")
+            sorted_moves = sorted(visit_counts.items(), key=lambda x: -x[1])
+            for move, count in sorted_moves:
+                pct = count / total_visits * 100
+                bar = "█" * int(pct / 2)
+                marker = " ← 选中" if move == best_move else ""
+                log(f"  位置 {move}: {count:4d} 次 ({pct:5.1f}%) {bar}{marker}")
+
+            # 显示神经网络先验概率
+            state_t = torch.FloatTensor(board.to_tensor()).unsqueeze(0)
+            with torch.no_grad():
+                net_policy, net_value = net(state_t)
+            net_probs = torch.softmax(net_policy, dim=1).squeeze().numpy()
+            log(f"神经网络评估: 胜率预测 {net_value.item():+.2f}")
+            log(f"神经网络先验 (Top 3):")
+            top3 = sorted(range(9), key=lambda i: -net_probs[i])[:3]
+            for i in top3:
+                log(f"  位置 {i}: {net_probs[i]*100:.1f}%")
+
         board.play(best_move)
+        move_history.append((player_name, best_move))
+
+        if verbose or log_file:
+            log(f"决策: {player_name} 落子位置 {best_move}")
 
         # 检查游戏是否结束
         winner = board.check_winner()
         if winner is not None:
             break
+
+    # 记录对局结果
+    if verbose or log_file:
+        log(f"\n{'─'*50}")
+        if winner == 1:
+            result = "X(黑) 胜"
+        elif winner == -1:
+            result = "O(白) 胜"
+        else:
+            result = "平局"
+        log(f"对局结果: {result} (共 {step} 步)")
+        log(f"走法记录: {' → '.join([f'{p}@{m}' for p, m in move_history])}")
+        log(f"{'─'*50}")
 
     # 把 winner 转成每个训练样本的标签
     training_data = []
@@ -286,23 +367,48 @@ def self_play(net, num_simulations=50):
     return training_data, winner
 
 
-def train(num_games=200, num_simulations=50, lr=0.003):
+def train(num_games=200, num_simulations=50, lr=0.003, verbose=False, log_path="training_log.txt"):
     """
     完整的训练流程：
     1. 自我对弈生成数据
     2. 用数据训练神经网络
     3. 重复，越来越强
+
+    参数：
+      verbose: True 时每局都打印详细对弈过程；False 时只打印摘要
+      log_path: 日志文件路径（始终写入，不受 verbose 影响）
     """
     net = PolicyValueNet()
     optimizer = optim.Adam(net.parameters(), lr=lr)
 
+    # 打开日志文件
+    log_file = open(log_path, "w", encoding="utf-8")
+    log_file.write(f"AlphaGo 井字棋训练日志\n")
+    log_file.write(f"训练参数: {num_games} 局, {num_simulations} 次模拟/步, lr={lr}\n")
+    log_file.write(f"开始时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+    log_file.write(f"{'='*50}\n")
+
     print("=" * 50)
     print("AlphaGo 井字棋 - 开始训练")
+    print(f"日志文件: {log_path}")
     print("=" * 50)
 
+    # 统计
+    stats = {"black_win": 0, "white_win": 0, "draw": 0}
+    start_time = time.time()
+
     for game_idx in range(num_games):
+        game_start = time.time()
+
         # --- 自我对弈 ---
-        data, winner = self_play(net, num_simulations)
+        # 前5局和每10局详细记录，其余只写日志文件
+        show_verbose = verbose or (game_idx < 5) or ((game_idx + 1) % 10 == 0)
+        data, winner = self_play(
+            net, num_simulations,
+            verbose=show_verbose and verbose,  # 控制台只在 verbose 模式打印
+            log_file=log_file,
+            game_idx=game_idx + 1
+        )
 
         # --- 用对弈数据训练网络 ---
         total_loss = 0
@@ -328,13 +434,45 @@ def train(num_games=200, num_simulations=50, lr=0.003):
             optimizer.step()
             total_loss += loss.item()
 
-        # 每 20 局打印一次进度
-        if (game_idx + 1) % 20 == 0:
-            result_str = {1: "黑赢", -1: "白赢", 0: "平局"}[winner]
-            print(f"第 {game_idx+1:3d} 局 | 结果: {result_str} | 平均损失: {total_loss/len(data):.4f}")
+        # 更新统计
+        game_time = time.time() - game_start
+        if winner == 1:
+            stats["black_win"] += 1
+        elif winner == -1:
+            stats["white_win"] += 1
+        else:
+            stats["draw"] += 1
 
-    print("=" * 50)
-    print("训练完成！")
+        # 每 10 局打印一次进度摘要
+        if (game_idx + 1) % 10 == 0:
+            result_str = {1: "黑赢", -1: "白赢", 0: "平局"}[winner]
+            elapsed = time.time() - start_time
+            print(
+                f"第 {game_idx+1:3d}/{num_games} 局 | "
+                f"结果: {result_str} | "
+                f"损失: {total_loss/len(data):.4f} | "
+                f"耗时: {game_time:.1f}s | "
+                f"统计: 黑{stats['black_win']} 白{stats['white_win']} 平{stats['draw']}"
+            )
+
+            # 写入日志摘要
+            log_file.write(f"\n[摘要] 第 {game_idx+1} 局 | "
+                          f"损失: {total_loss/len(data):.4f} | "
+                          f"耗时: {game_time:.1f}s | "
+                          f"累计: 黑{stats['black_win']} 白{stats['white_win']} 平{stats['draw']}\n")
+
+    total_time = time.time() - start_time
+    summary = (
+        f"\n{'='*50}\n"
+        f"训练完成！\n"
+        f"总耗时: {total_time:.1f}s\n"
+        f"战绩统计: 黑赢 {stats['black_win']} | 白赢 {stats['white_win']} | 平局 {stats['draw']}\n"
+        f"{'='*50}"
+    )
+    print(summary)
+    log_file.write(summary)
+    log_file.close()
+    print(f"详细日志已保存到: {log_path}")
     return net
 
 
@@ -391,15 +529,36 @@ def play_against_human(net, num_simulations=200):
 # ============================================================
 
 if __name__ == "__main__":
-    # 训练
-    net = train(num_games=200, num_simulations=50)
+    import sys
 
-    # 保存模型
-    torch.save(net.state_dict(), "tictactoe_alphago.pth")
-    print("\n模型已保存到 tictactoe_alphago.pth")
+    # 支持命令行参数
+    # python alphago_tictactoe.py              → 默认训练（摘要模式）
+    # python alphago_tictactoe.py --verbose    → 详细对弈日志
+    # python alphago_tictactoe.py --play       → 加载已有模型直接对弈
+    verbose = "--verbose" in sys.argv
+    play_only = "--play" in sys.argv
 
-    # 人机对弈
-    print("\n" + "=" * 50)
-    print("来和 AI 下一盘吧！")
-    print("=" * 50)
-    play_against_human(net)
+    if play_only:
+        net = PolicyValueNet()
+        net.load_state_dict(torch.load("tictactoe_alphago.pth", weights_only=True))
+        net.eval()
+        print("已加载模型 tictactoe_alphago.pth")
+        play_against_human(net)
+    else:
+        # 训练
+        net = train(
+            num_games=200,
+            num_simulations=50,
+            verbose=verbose,
+            log_path="training_log.txt"
+        )
+
+        # 保存模型
+        torch.save(net.state_dict(), "tictactoe_alphago.pth")
+        print("\n模型已保存到 tictactoe_alphago.pth")
+
+        # 人机对弈
+        print("\n" + "=" * 50)
+        print("来和 AI 下一盘吧！")
+        print("=" * 50)
+        play_against_human(net)

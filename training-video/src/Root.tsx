@@ -25,7 +25,7 @@ export const RemotionRoot = () => {
       <Composition
         id="MCTSVisualization"
         component={MCTSVisualization}
-        durationInFrames={4500}
+        durationInFrames={5340}
         fps={30}
         width={1920}
         height={1080}

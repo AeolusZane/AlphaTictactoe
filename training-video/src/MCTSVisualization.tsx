@@ -203,7 +203,39 @@ export const MCTSVisualization: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0a0a", fontFamily: "monospace" }}>
       {/* 背景音乐 */}
-      <Audio src={staticFile("audio/bgm.mp3")} volume={0.3} />
+      <Audio src={staticFile("audio/bgm.mp3")} volume={0.2} />
+
+      {/* 配音 */}
+      <Sequence from={0} durationInFrames={5 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-title.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={5 * fps} durationInFrames={10 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-problem.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={15 * fps} durationInFrames={10 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-idea.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={25 * fps} durationInFrames={10 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-tree.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={35 * fps} durationInFrames={15 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-selection.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={50 * fps} durationInFrames={15 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-expansion.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={65 * fps} durationInFrames={15 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-backprop.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={80 * fps} durationInFrames={20 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-simulate.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={100 * fps} durationInFrames={10 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-result.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={110 * fps} durationInFrames={10 * fps}>
+        <Audio src={staticFile("audio/mcts/narration-summary.mp3")} volume={1.0} />
+      </Sequence>
 
       {/* 标题场景 */}
       {currentScene === "title" && (

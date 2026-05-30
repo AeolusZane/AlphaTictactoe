@@ -12,6 +12,38 @@ const trainingGames = [
       [0.10, 0.08, 0.30, 0.15, 0.05, 0.12, 0.08, 0.07, 0.05],
       [0.05, 0.08, 0.10, 0.12, 0.05, 0.15, 0.35, 0.05, 0.05],
     ],
+    explanations: [
+      {
+        player: "X (黑棋)",
+        action: "MCTS 搜索中...",
+        detail: "神经网络预测每个位置的胜率，MCTS 模拟 50 次随机对局",
+        decision: "选择位置 4（中心）- 开局最佳策略",
+      },
+      {
+        player: "O (白棋)",
+        action: "MCTS 搜索中...",
+        detail: "对手已占中心，需要选择防守或进攻位置",
+        decision: "选择位置 0（左上角）- 常见应对",
+      },
+      {
+        player: "X (黑棋)",
+        action: "MCTS 搜索中...",
+        detail: "分析当前局面，寻找形成威胁的机会",
+        decision: "选择位置 8（右下角）- 形成对角线",
+      },
+      {
+        player: "O (白棋)",
+        action: "MCTS 搜索中...",
+        detail: "检测到 X 的对角线威胁，必须防守",
+        decision: "选择位置 1（上中）- 尝试反击",
+      },
+      {
+        player: "X (黑棋)",
+        action: "MCTS 搜索中...",
+        detail: "发现获胜机会！形成双重威胁",
+        decision: "选择位置 6（左下角）- 获胜！",
+      },
+    ],
   },
   {
     moves: [4, 2, 6, 0, 8],
@@ -23,6 +55,38 @@ const trainingGames = [
       [0.35, 0.08, 0.10, 0.12, 0.05, 0.10, 0.08, 0.07, 0.05],
       [0.05, 0.08, 0.10, 0.10, 0.05, 0.12, 0.10, 0.05, 0.35],
     ],
+    explanations: [
+      {
+        player: "X (黑棋)",
+        action: "MCTS 搜索中...",
+        detail: "第二局开始，神经网络已学到一些经验",
+        decision: "选择位置 4（中心）- 依然是最优开局",
+      },
+      {
+        player: "O (白棋)",
+        action: "MCTS 搜索中...",
+        detail: "这次选择不同的应对策略",
+        decision: "选择位置 2（右上角）- 变化开局",
+      },
+      {
+        player: "X (黑棋)",
+        action: "MCTS 搜索中...",
+        detail: "分析新的局面，寻找进攻路线",
+        decision: "选择位置 6（左下角）- 形成对角",
+      },
+      {
+        player: "O (白棋)",
+        action: "MCTS 搜索中...",
+        detail: "需要阻止 X 的对角线威胁",
+        decision: "选择位置 0（左上角）- 防守",
+      },
+      {
+        player: "X (黑棋)",
+        action: "MCTS 搜索中...",
+        detail: "发现获胜路线！",
+        decision: "选择位置 8（右下角）- 完成对角线！",
+      },
+    ],
   },
 ];
 
@@ -30,25 +94,31 @@ export const TicTacToeTraining: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 动画阶段
-  const titlePhase = frame < 3 * fps;
-  const gamePhase = frame >= 3 * fps && frame < 25 * fps;
-  const statsPhase = frame >= 25 * fps;
+  // 动画阶段 - 延长总时长到 60 秒
+  const titlePhase = frame < 4 * fps;
+  const introPhase = frame >= 4 * fps && frame < 8 * fps;
+  const gamePhase = frame >= 8 * fps && frame < 48 * fps;
+  const statsPhase = frame >= 48 * fps;
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0a0a", fontFamily: "monospace" }}>
       {/* 标题 */}
-      <Sequence from={0} durationInFrames={3 * fps}>
+      <Sequence from={0} durationInFrames={4 * fps}>
         <Title />
       </Sequence>
 
-      {/* 对弈演示 */}
-      <Sequence from={3 * fps} durationInFrames={22 * fps}>
+      {/* 介绍 */}
+      <Sequence from={4 * fps} durationInFrames={4 * fps}>
+        <Intro />
+      </Sequence>
+
+      {/* 对弈演示 - 延长到 40 秒 */}
+      <Sequence from={8 * fps} durationInFrames={40 * fps}>
         <GamePlaythrough gameIndex={0} />
       </Sequence>
 
       {/* 统计信息 */}
-      <Sequence from={25 * fps} durationInFrames={5 * fps}>
+      <Sequence from={48 * fps} durationInFrames={12 * fps}>
         <TrainingStats />
       </Sequence>
     </AbsoluteFill>
@@ -101,13 +171,70 @@ const Title: React.FC = () => {
   );
 };
 
+const Intro: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const opacity = interpolate(frame, [0, fps], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        opacity,
+        padding: 100,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 36,
+          color: "#00ff88",
+          marginBottom: 40,
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        训练过程演示
+      </div>
+      <div
+        style={{
+          fontSize: 24,
+          color: "#ccc",
+          lineHeight: 1.8,
+          textAlign: "center",
+          maxWidth: 1200,
+        }}
+      >
+        <div style={{ marginBottom: 20 }}>
+          接下来你将看到 AI 自我对弈的一局完整过程
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <span style={{ color: "#00ff88" }}>左侧</span>：实时棋盘状态
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <span style={{ color: "#00ff88" }}>右侧</span>：MCTS 搜索分布（每个位置的胜率预测）
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <span style={{ color: "#ffaa00" }}>底部</span>：每一步的详细讲解
+        </div>
+        <div style={{ marginTop: 40, fontSize: 20, color: "#888" }}>
+          每步停留 8 秒，请仔细阅读
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 const GamePlaythrough: React.FC<{ gameIndex: number }> = ({ gameIndex }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const game = trainingGames[gameIndex];
 
-  // 每步 4 秒
-  const stepDuration = 4 * fps;
+  // 每步 8 秒，给观众足够时间阅读
+  const stepDuration = 8 * fps;
   const currentStep = Math.floor(frame / stepDuration);
   const stepFrame = frame % stepDuration;
 
@@ -116,28 +243,88 @@ const GamePlaythrough: React.FC<{ gameIndex: number }> = ({ gameIndex }) => {
     board[game.moves[i]] = i % 2 === 0 ? "X" : "O";
   }
 
+  const explanation = game.explanations[currentStep];
+
   return (
     <AbsoluteFill
       style={{
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        padding: 60,
+        flexDirection: "column",
+        padding: 40,
       }}
     >
-      {/* 左侧：棋盘 */}
-      <div style={{ flex: 1 }}>
-        <Board board={board} currentStep={currentStep} />
+      {/* 顶部：讲解文字 */}
+      <div
+        style={{
+          backgroundColor: "#1a1a1a",
+          padding: 30,
+          borderRadius: 12,
+          marginBottom: 30,
+          border: "2px solid #00ff88",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 32,
+            color: "#00ff88",
+            fontWeight: "bold",
+            marginBottom: 15,
+          }}
+        >
+          第 {currentStep + 1} 步 - {explanation?.player}
+        </div>
+        <div
+          style={{
+            fontSize: 24,
+            color: "#ffaa00",
+            marginBottom: 10,
+          }}
+        >
+          {explanation?.action}
+        </div>
+        <div
+          style={{
+            fontSize: 20,
+            color: "#ccc",
+            marginBottom: 10,
+          }}
+        >
+          {explanation?.detail}
+        </div>
+        <div
+          style={{
+            fontSize: 22,
+            color: "#00ff88",
+            fontWeight: "bold",
+          }}
+        >
+          → {explanation?.decision}
+        </div>
       </div>
 
-      {/* 右侧：MCTS 分布 */}
-      <div style={{ flex: 1 }}>
-        {currentStep < game.mctsDistribution.length && (
-          <MCTSDistribution
-            distribution={game.mctsDistribution[currentStep]}
-            stepFrame={stepFrame}
-          />
-        )}
+      {/* 下方：棋盘和 MCTS 分布 */}
+      <div
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+        }}
+      >
+        {/* 左侧：棋盘 */}
+        <div style={{ flex: 1 }}>
+          <Board board={board} currentStep={currentStep} />
+        </div>
+
+        {/* 右侧：MCTS 分布 */}
+        <div style={{ flex: 1 }}>
+          {currentStep < game.mctsDistribution.length && (
+            <MCTSDistribution
+              distribution={game.mctsDistribution[currentStep]}
+              stepFrame={stepFrame}
+            />
+          )}
+        </div>
       </div>
     </AbsoluteFill>
   );

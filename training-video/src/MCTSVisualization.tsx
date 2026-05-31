@@ -481,7 +481,7 @@ export const MCTSVisualization: React.FC = () => {
                   fill="none"
                   stroke="#4CAF50"
                   strokeWidth={4}
-                  opacity={interpolate(sceneFrame, [0, fps * 2], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [0, fps, fps * 2], [0, 1, 1], { extrapolateRight: "clamp" })}
                 />
                 <text
                   x={width / 2 - 240}
@@ -490,7 +490,7 @@ export const MCTSVisualization: React.FC = () => {
                   fill="#4CAF50"
                   fontSize={18}
                   fontWeight="bold"
-                  opacity={interpolate(sceneFrame, [0, fps * 2], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [0, fps, fps * 2], [0, 1, 1], { extrapolateRight: "clamp" })}
                 >
                   v = +0.3
                 </text>
@@ -502,7 +502,7 @@ export const MCTSVisualization: React.FC = () => {
                   strokeWidth={4}
                   fill="none"
                   strokeDasharray="10,5"
-                  opacity={interpolate(sceneFrame, [fps * 2, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [fps * 2, fps * 3, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
                 />
                 <circle
                   cx={width / 2 - 200}
@@ -511,7 +511,7 @@ export const MCTSVisualization: React.FC = () => {
                   fill="none"
                   stroke="#ff6b6b"
                   strokeWidth={4}
-                  opacity={interpolate(sceneFrame, [fps * 2, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [fps * 2, fps * 3, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
                 />
                 <text
                   x={width / 2 - 200}
@@ -520,7 +520,7 @@ export const MCTSVisualization: React.FC = () => {
                   fill="#ff6b6b"
                   fontSize={18}
                   fontWeight="bold"
-                  opacity={interpolate(sceneFrame, [fps * 2, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [fps * 2, fps * 3, fps * 4], [0, 1, 1], { extrapolateRight: "clamp" })}
                 >
                   v = -0.3（翻转）
                 </text>
@@ -532,7 +532,7 @@ export const MCTSVisualization: React.FC = () => {
                   strokeWidth={4}
                   fill="none"
                   strokeDasharray="10,5"
-                  opacity={interpolate(sceneFrame, [fps * 4, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [fps * 4, fps * 5, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
                 />
                 <circle
                   cx={width / 2}
@@ -541,7 +541,7 @@ export const MCTSVisualization: React.FC = () => {
                   fill="none"
                   stroke="#4CAF50"
                   strokeWidth={4}
-                  opacity={interpolate(sceneFrame, [fps * 4, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [fps * 4, fps * 5, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
                 />
                 <text
                   x={width / 2}
@@ -550,7 +550,7 @@ export const MCTSVisualization: React.FC = () => {
                   fill="#4CAF50"
                   fontSize={18}
                   fontWeight="bold"
-                  opacity={interpolate(sceneFrame, [fps * 4, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
+                  opacity={interpolate(sceneFrame, [fps * 4, fps * 5, fps * 6], [0, 1, 1], { extrapolateRight: "clamp" })}
                 >
                   v = +0.3（再翻转）
                 </text>

@@ -145,23 +145,6 @@ const DepthLabels: React.FC = () => (
   </g>
 );
 
-// 层标签组件 — 标注每层是谁在下棋
-const DepthLabels: React.FC = () => {
-  return (
-    <g>
-      <text x={30} y={155} fill="#FFD700" fontSize={16} fontFamily="monospace" fontWeight="bold">
-        黑棋走
-      </text>
-      <text x={30} y={305} fill="#ff6b6b" fontSize={16} fontFamily="monospace" fontWeight="bold">
-        白棋走
-      </text>
-      <text x={30} y={455} fill="#FFD700" fontSize={16} fontFamily="monospace" fontWeight="bold">
-        黑棋走
-      </text>
-    </g>
-  );
-};
-
 // 主组件
 export const MCTSVisualization: React.FC = () => {
   const frame = useCurrentFrame();

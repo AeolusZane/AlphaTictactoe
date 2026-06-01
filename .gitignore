@@ -1,0 +1,13 @@
+node_modules/
+training_log.txt
+training_log_verbose.txt
+training_log_full.txt
+*.mp4
+files/
+skills/
+subagents/
+tools/
+mcp_servers/
+memories/
+preferences/
+training-video/

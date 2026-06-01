@@ -1,0 +1,14 @@
+{
+  "name": "alphago-tictactoe",
+  "version": "1.0.0",
+  "description": "AlphaGo 简化版井字棋 - Node.js + TensorFlow.js",
+  "main": "alphago_tictactoe.js",
+  "scripts": {
+    "train": "node alphago_tictactoe.js",
+    "verbose": "node alphago_tictactoe.js --verbose",
+    "play": "node alphago_tictactoe.js --play"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.17.0"
+  }
+}
